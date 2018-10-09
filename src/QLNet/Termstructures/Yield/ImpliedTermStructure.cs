@@ -51,7 +51,7 @@ namespace QLNet
       //! returns the discount factor as seen from the evaluation date
       /* t is relative to the current reference date and needs to be converted to the time relative
          to the reference date of the original curve */
-      protected override double discountImpl(double t)
+      protected internal override double discountImpl(double t)
       {
          Date refDate = referenceDate();
          double originalTime = t + dayCounter().yearFraction(originalCurve_.link.referenceDate(), refDate);

@@ -1,18 +1,19 @@
 /*
  Copyright (C) 2008 Toyin Akin (toyin_akin@hotmail.com)
  Copyright (C) 2008-2016 Andrea Maggiulli (a.maggiulli@gmail.com)
-
+ Copyright (C) 2018 Jean-Camille Tournier (jean-camille.tournier@avivainvestors.com)
+  
  This file is part of QLNet Project https://github.com/amaggiulli/qlnet
 
  QLNet is free software: you can redistribute it and/or modify it
  under the terms of the QLNet license.  You should have received a
- copy of the license along with this program; if not, license is
- available at <https://github.com/amaggiulli/QLNet/blob/develop/LICENSE>.
-
+ copy of the license along with this program; if not, license is  
+ available online at <http://qlnet.sourceforge.net/License.html>.
+  
  QLNet is a based on QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
  The QuantLib license is available online at http://quantlib.org/license.shtml.
-
+ 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
@@ -31,7 +32,7 @@ namespace QLNet
    {
       #region Constructors
 
-      protected DefaultProbabilityTermStructure(DayCounter dc = null, List<Handle<Quote> > jumps = null, List<Date> jumpDates = null)
+      protected DefaultProbabilityTermStructure(DayCounter dc = null, List<Handle<Quote>> jumps = null, List<Date> jumpDates = null)
          : base(dc)
       {
          if (jumps != null)
@@ -52,7 +53,7 @@ namespace QLNet
       }
 
       protected DefaultProbabilityTermStructure(Date referenceDate, Calendar cal = null, DayCounter dc = null,
-                                                List<Handle<Quote> > jumps = null, List<Date> jumpDates = null)
+            List<Handle<Quote>> jumps = null, List<Date> jumpDates = null)
          : base(referenceDate, cal, dc)
       {
          if (jumps != null)
@@ -73,8 +74,8 @@ namespace QLNet
       }
 
       protected DefaultProbabilityTermStructure(int settlementDays, Calendar cal, DayCounter dc = null,
-                                                List<Handle<Quote> > jumps = null, List<Date> jumpDates = null)
-         : base(settlementDays, cal, dc)
+            List<Handle<Quote>> jumps = null, List<Date> jumpDates = null)
+          : base(settlementDays, cal, dc)
       {
          if (jumps != null)
             jumps_ = jumps;
@@ -159,7 +160,7 @@ namespace QLNet
       public double defaultProbability(double t1, double t2, bool extrapo = false)
       {
          Utils.QL_REQUIRE(t1 <= t2, () => "initial time (" + t1 + ") later than final time (" + t2 + ")");
-         double p1 = t1 < 0.0 ? 0.0 : defaultProbability(t1, extrapolate),  p2 = defaultProbability(t2, extrapolate);
+         double p1 = t1 < 0.0 ? 0.0 : defaultProbability(t1, extrapolate), p2 = defaultProbability(t2, extrapolate);
          return p2 - p1;
       }
 
@@ -189,11 +190,11 @@ namespace QLNet
       //    These methods returns the hazard rate at a given date or time.
       //    In the latter case, the time is calculated as a fraction of year
       //    from the reference date.
-      //
+      //    
       //    Hazard rates are defined with annual frequency and continuous
       //    compounding.
 
-      public double hazardRate(Date d,  bool extrapolate = false)
+      public double hazardRate(Date d, bool extrapolate = false)
       {
          return hazardRate(timeFromReference(d), extrapolate);
       }
@@ -208,8 +209,8 @@ namespace QLNet
 
       #region Jump inspectors
 
-      public List<Date> jumpDates() { return this.jumpDates_;}
-      public List<double> jumpTimes() {return this.jumpTimes_;}
+      public List<Date> jumpDates() { return this.jumpDates_; }
+      public List<double> jumpTimes() { return this.jumpTimes_; }
 
       #endregion
 
@@ -233,10 +234,13 @@ namespace QLNet
       // must assume that extrapolation is required.
 
       //! survival probability calculation
-      protected abstract double survivalProbabilityImpl(double t);
+      protected internal abstract double survivalProbabilityImpl(double t);
 
       //! default density calculation
-      protected abstract double defaultDensityImpl(double t);
+      protected internal abstract double defaultDensityImpl(double t);
+
+      //! hazard rate calculation
+      protected internal abstract double hazardRateImpl(double t);
 
       #endregion
 
@@ -258,8 +262,8 @@ namespace QLNet
          {
             // fixed dats
             Utils.QL_REQUIRE(jumpDates_.Count == nJumps_, () =>
-                             "mismatch between number of jumps (" + nJumps_ +
-                             ") and jump dates (" + jumpDates_.Count + ")");
+                      "mismatch between number of jumps (" + nJumps_ +
+                      ") and jump dates (" + jumpDates_.Count + ")");
          }
          for (int i = 0; i < nJumps_; ++i)
             jumpTimes_.Add(timeFromReference(jumpDates_[i]));
@@ -267,7 +271,7 @@ namespace QLNet
          latestReference_ = base.referenceDate();
       }
       // data members
-      private List<Handle<Quote> > jumps_;
+      private List<Handle<Quote>> jumps_;
       private List<Date> jumpDates_;
       private List<double> jumpTimes_;
       private int nJumps_;

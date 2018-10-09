@@ -47,7 +47,7 @@ namespace QLNet
          notifyObservers();
       }
 
-      protected override double discountImpl(double d)
+      protected internal override double discountImpl(double d)
       {
          return model_.discountBond(t_, d + t_, r_);
       }

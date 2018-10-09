@@ -1,18 +1,19 @@
 /*
  Copyright (C) 2008 Siarhei Novik (snovik@gmail.com)
  Copyright (C) 2008-2016 Andrea Maggiulli (a.maggiulli@gmail.com)
-
+ Copyright (C) 2018 Jean-Camille Tournier (jean-camille.tournier@avivainvestors.com)
+  
  This file is part of QLNet Project https://github.com/amaggiulli/qlnet
 
  QLNet is free software: you can redistribute it and/or modify it
  under the terms of the QLNet license.  You should have received a
- copy of the license along with this program; if not, license is
- available at <https://github.com/amaggiulli/QLNet/blob/develop/LICENSE>.
-
+ copy of the license along with this program; if not, license is  
+ available online at <http://qlnet.sourceforge.net/License.html>.
+  
  QLNet is a based on QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
  The QuantLib license is available online at http://quantlib.org/license.shtml.
-
+ 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
@@ -36,7 +37,7 @@ namespace QLNet
 
       #region Constructors
 
-      protected YieldTermStructure(DayCounter dc = null, List<Handle<Quote> > jumps = null, List<Date> jumpDates = null)
+      protected YieldTermStructure(DayCounter dc = null, List<Handle<Quote>> jumps = null, List<Date> jumpDates = null)
          : base(dc)
       {
          if (jumps != null)
@@ -57,7 +58,7 @@ namespace QLNet
       }
 
       protected YieldTermStructure(Date referenceDate, Calendar cal = null, DayCounter dc = null,
-                                   List<Handle<Quote> > jumps = null, List<Date> jumpDates = null)
+                                List<Handle<Quote>> jumps = null, List<Date> jumpDates = null)
          : base(referenceDate, cal, dc)
       {
          if (jumps != null)
@@ -78,7 +79,7 @@ namespace QLNet
       }
 
       protected YieldTermStructure(int settlementDays, Calendar cal, DayCounter dc = null,
-                                   List<Handle<Quote> > jumps = null, List<Date> jumpDates = null)
+                                List<Handle<Quote>> jumps = null, List<Date> jumpDates = null)
          : base(settlementDays, cal, dc)
       {
          if (jumps != null)
@@ -130,7 +131,7 @@ namespace QLNet
                double thisJump = jumps_[i].link.value();
                Utils.QL_REQUIRE(thisJump > 0.0, () => "invalid " + (i + 1) + " jump value: " + thisJump);
 #if !QL_NEGATIVE_RATES
-               Utils.QL_REQUIRE(thisJump <= 1.0, () => "invalid " + (i + 1) + " jump value: " + thisJump);
+               Utils.QL_REQUIRE(thisJump <= 1.0,()=> "invalid " + (i+1) + " jump value: " + thisJump);
 #endif
                jumpEffect *= thisJump;
             }
@@ -157,7 +158,7 @@ namespace QLNet
             double compound = 1.0 / discount(dt, extrapolate);
             // t has been calculated with a possibly different daycounter
             // but the difference should not matter for very small times
-            return InterestRate. impliedRate(compound, dayCounter, comp, freq,  dt);
+            return InterestRate.impliedRate(compound, dayCounter, comp, freq, dt);
          }
          double compound1 = 1.0 / discount(d, extrapolate);
          return InterestRate.impliedRate(compound1, dayCounter, comp, freq, referenceDate(), d);
@@ -169,8 +170,7 @@ namespace QLNet
       */
       public InterestRate zeroRate(double t, Compounding comp, Frequency freq = Frequency.Annual, bool extrapolate = false)
       {
-         if (t.IsEqual(0.0))
-            t = dt;
+         if (t.IsEqual(0.0)) t = dt;
          double compound = 1.0 / discount(t, extrapolate);
          return InterestRate.impliedRate(compound, dayCounter(), comp, freq, t);
       }
@@ -190,7 +190,7 @@ namespace QLNet
           rule.
       */
       public InterestRate forwardRate(Date d1, Date d2, DayCounter dayCounter, Compounding comp,
-                                      Frequency freq = Frequency.Annual, bool extrapolate = false)
+         Frequency freq = Frequency.Annual, bool extrapolate = false)
       {
          if (d1 == d2)
          {
@@ -212,7 +212,7 @@ namespace QLNet
           \warning dates are not adjusted for holidays
       */
       public InterestRate forwardRate(Date d, Period p, DayCounter dayCounter, Compounding comp,
-                                      Frequency freq = Frequency.Annual, bool extrapolate = false)
+                               Frequency freq = Frequency.Annual, bool extrapolate = false)
       {
          return forwardRate(d, d + p, dayCounter, comp, freq, extrapolate);
       }
@@ -222,7 +222,7 @@ namespace QLNet
           for calculating the passed times t1 and t2.
       */
       public InterestRate forwardRate(double t1, double t2, Compounding comp, Frequency freq = Frequency.Annual,
-                                      bool extrapolate = false)
+         bool extrapolate = false)
       {
          double compound;
          if (t2.IsEqual(t1))
@@ -274,7 +274,7 @@ namespace QLNet
       //    must assume that extrapolation is required.
 
       //! discount factor calculation
-      protected abstract double discountImpl(double d);
+      protected internal abstract double discountImpl(double d);
 
       #endregion
 
@@ -295,8 +295,8 @@ namespace QLNet
          {
             // fixed dats
             Utils.QL_REQUIRE(jumpDates_.Count == nJumps_, () =>
-                             "mismatch between number of jumps (" + nJumps_ +
-                             ") and jump dates (" + jumpDates_.Count + ")");
+                      "mismatch between number of jumps (" + nJumps_ +
+                      ") and jump dates (" + jumpDates_.Count + ")");
          }
          for (int i = 0; i < nJumps_; ++i)
             jumpTimes_.Add(timeFromReference(jumpDates_[i]));
@@ -305,7 +305,7 @@ namespace QLNet
       }
 
       // data members
-      private List<Handle<Quote> > jumps_;
+      private List<Handle<Quote>> jumps_;
       private List<Date> jumpDates_;
       private List<double> jumpTimes_;
       private int nJumps_;

@@ -25,14 +25,14 @@ using System.Linq;
 
 namespace QLNet
 {
-   // this is an abstract class to give access to all properties and methods of PiecewiseYieldCurve and avoiding generics
-   public class PiecewiseYieldCurve : YieldTermStructure, Curve<YieldTermStructure>
+   // this is an abstract class to give access to all properties and methods of PiecewiseDefaultCurve and avoiding generics
+   public class PiecewiseDefaultCurve : DefaultProbabilityTermStructure, Curve<DefaultProbabilityTermStructure>
    {
       #region new fields: Curve
 
       public double initialValue() { return _traits_.initialValue(this); }
       public Date initialDate() { return _traits_.initialDate(this); }
-      public void registerWith(BootstrapHelper<YieldTermStructure> helper)
+      public void registerWith(BootstrapHelper<DefaultProbabilityTermStructure> helper)
       {
          helper.registerWith(this.update);
       }
@@ -41,21 +41,21 @@ namespace QLNet
          get { return base.moving_; }
          set { base.moving_ = value; }
       }
-      public void setTermStructure(BootstrapHelper<YieldTermStructure> helper)
+      public void setTermStructure(BootstrapHelper<DefaultProbabilityTermStructure> helper)
       {
          helper.setTermStructure(this);
       }
-      protected ITraits<YieldTermStructure> _traits_ = null;//todo define with the trait for yield curve
-      public ITraits<YieldTermStructure> traits_
+      protected ITraits<DefaultProbabilityTermStructure> _traits_ = null;//todo define with the trait for yield curve
+      public ITraits<DefaultProbabilityTermStructure> traits_
       {
          get
          {
             return _traits_;
          }
       }
-      public double minValueAfter<C>(int i, C c, bool validData, int first) where C : Curve<YieldTermStructure> { return traits_.minValueAfter(i, c, validData, first); }
-      public double maxValueAfter<C>(int i, C c, bool validData, int first) where C : Curve<YieldTermStructure> { return traits_.maxValueAfter(i, c, validData, first); }
-      public double guess<C>(int i, C c, bool validData, int first) where C : Curve<YieldTermStructure> { return traits_.guess(i, c, validData, first); }
+      public double minValueAfter<C>(int i, C c, bool validData, int first) where C : Curve<DefaultProbabilityTermStructure> { return traits_.minValueAfter(i, c, validData, first); }
+      public double maxValueAfter<C>(int i, C c, bool validData, int first) where C : Curve<DefaultProbabilityTermStructure> { return traits_.maxValueAfter(i, c, validData, first); }
+      public double guess<C>(int i, C c, bool validData, int first) where C : Curve<DefaultProbabilityTermStructure> { return traits_.guess(i, c, validData, first); }
 
       #endregion
 
@@ -73,7 +73,7 @@ namespace QLNet
          set { (base_curve as InterpolatedCurve).dates_ = value; }
       }
       public List<Date> dates() { calculate(); return (base_curve as InterpolatedCurve).dates(); }
-      // here we do not refer to the base curve as in QL because our base curve is YieldTermStructure and not Traits::base_curve
+      // here we do not refer to the base curve as in QL because our base curve is DefaultProbabilityTermStructure and not Traits::base_curve
       public Date maxDate_
       {
          get { return (base_curve as InterpolatedCurve).maxDate(); }
@@ -132,15 +132,15 @@ namespace QLNet
          copy.data_ = new List<double>(data_);
          copy.interpolator_ = interpolator_;
          copy.setupInterpolation();
-         (copy as PiecewiseYieldCurve).base_curve = (base_curve as InterpolatedCurve).Clone() as YieldTermStructure;
+         (copy as PiecewiseDefaultCurve).base_curve = (base_curve as InterpolatedCurve).Clone() as DefaultProbabilityTermStructure;
          return copy;
       }
       #endregion
 
       #region BootstrapTraits
 
-      public Date initialDate(YieldTermStructure c) { return traits_.initialDate(c); }
-      public double initialValue(YieldTermStructure c) { return traits_.initialValue(c); }
+      public Date initialDate(DefaultProbabilityTermStructure c) { return traits_.initialDate(c); }
+      public double initialValue(DefaultProbabilityTermStructure c) { return traits_.initialValue(c); }
       public void updateGuess(List<double> data, double discount, int i) { traits_.updateGuess(data, discount, i); }
       public int maxIterations() { return traits_.maxIterations(); }
 
@@ -155,72 +155,85 @@ namespace QLNet
          set { _accuracy_ = value; }
       }
 
-      protected List<RateHelper> _instruments_ = new List<RateHelper>();
-      public List<BootstrapHelper<YieldTermStructure>> instruments_
+      protected List<BootstrapHelper<DefaultProbabilityTermStructure>> _instruments_ = new List<BootstrapHelper<DefaultProbabilityTermStructure>>();
+      public List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments_
       {
          get
          {
             //todo edem 
-            List<BootstrapHelper<YieldTermStructure>> instruments = new List<BootstrapHelper<YieldTermStructure>>();
+            List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments = new List<BootstrapHelper<DefaultProbabilityTermStructure>>();
             _instruments_.ForEach((i, x) => instruments.Add(x));
             return instruments;
          }
       }
 
-      protected IBootStrap<PiecewiseYieldCurve> bootstrap_;
-      protected YieldTermStructure base_curve;
+      protected IBootStrap<PiecewiseDefaultCurve> bootstrap_;
+      protected DefaultProbabilityTermStructure base_curve;
 
       #endregion
 
-      protected internal override double discountImpl(double t)
+      protected internal override double survivalProbabilityImpl(double t)
       {
          calculate();
-         return base_curve.discountImpl(t);
+         return base_curve.survivalProbabilityImpl(t);
+      }
+
+      protected internal override double defaultDensityImpl(double t)
+      {
+         calculate();
+         return base_curve.defaultDensityImpl(t);
+      }
+
+      protected internal override double hazardRateImpl(double t)
+      {
+         calculate();
+         return base_curve.hazardRateImpl(t);
       }
 
       // two constructors to forward down the ctor chain
-      public PiecewiseYieldCurve(Date referenceDate, Calendar cal, DayCounter dc,
-         List<Handle<Quote>> jumps = null, List<Date> jumpDates = null) : base(referenceDate, cal, dc, jumps, jumpDates)
-      { }
-      public PiecewiseYieldCurve(int settlementDays, Calendar cal, DayCounter dc,
+      public PiecewiseDefaultCurve(Date referenceDate, Calendar cal, DayCounter dc,
          List<Handle<Quote>> jumps = null, List<Date> jumpDates = null)
-         : base(settlementDays, cal, dc, jumps, jumpDates)
+          : base(referenceDate, cal, dc, jumps, jumpDates)
       { }
-      public PiecewiseYieldCurve()
+      public PiecewiseDefaultCurve(int settlementDays, Calendar cal, DayCounter dc,
+         List<Handle<Quote>> jumps = null, List<Date> jumpDates = null)
+          : base(settlementDays, cal, dc, jumps, jumpDates)
+      { }
+      public PiecewiseDefaultCurve()
           : base()
       { }
    }
 
-   public class PiecewiseYieldCurve<Traits, Interpolator, BootStrap> : PiecewiseYieldCurve
-       where Traits : ITraits<YieldTermStructure>, new()
+   public class PiecewiseDefaultCurve<Traits, Interpolator, BootStrap> : PiecewiseDefaultCurve
+       where Traits : ITraits<DefaultProbabilityTermStructure>, new()
        where Interpolator : class, IInterpolationFactory, new()
-       where BootStrap : IBootStrap<PiecewiseYieldCurve>, new()
+       where BootStrap : IBootStrap<PiecewiseDefaultCurve>, new()
    {
 
       #region Constructors
-      public PiecewiseYieldCurve(Date referenceDate, List<RateHelper> instruments, DayCounter dayCounter)
-         : this(referenceDate, instruments, dayCounter, new List<Handle<Quote>>(), new List<Date>(),
-                  1.0e-12, FastActivator<Interpolator>.Create(), FastActivator<BootStrap>.Create())
+      public PiecewiseDefaultCurve(Date referenceDate, List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments, DayCounter dayCounter)
+          : this(referenceDate, instruments, dayCounter, new List<Handle<Quote>>(), new List<Date>(),
+                   1.0e-12, FastActivator<Interpolator>.Create(), FastActivator<BootStrap>.Create())
       { }
-      public PiecewiseYieldCurve(Date referenceDate, List<RateHelper> instruments,
+      public PiecewiseDefaultCurve(Date referenceDate, List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments,
                                  DayCounter dayCounter, List<Handle<Quote>> jumps, List<Date> jumpDates)
-         : this(referenceDate, instruments, dayCounter, jumps, jumpDates, 1.0e-12, FastActivator<Interpolator>.Create(),
-              FastActivator<BootStrap>.Create())
+          : this(referenceDate, instruments, dayCounter, jumps, jumpDates, 1.0e-12, FastActivator<Interpolator>.Create(),
+               FastActivator<BootStrap>.Create())
       { }
-      public PiecewiseYieldCurve(Date referenceDate, List<RateHelper> instruments,
+      public PiecewiseDefaultCurve(Date referenceDate, List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments,
                                  DayCounter dayCounter, List<Handle<Quote>> jumps,
                                  List<Date> jumpDates, double accuracy)
-         : this(referenceDate, instruments, dayCounter, jumps, jumpDates, accuracy, FastActivator<Interpolator>.Create(),
-              FastActivator<BootStrap>.Create())
+          : this(referenceDate, instruments, dayCounter, jumps, jumpDates, accuracy, FastActivator<Interpolator>.Create(),
+               FastActivator<BootStrap>.Create())
       { }
-      public PiecewiseYieldCurve(Date referenceDate, List<RateHelper> instruments,
+      public PiecewiseDefaultCurve(Date referenceDate, List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments,
                                  DayCounter dayCounter, List<Handle<Quote>> jumps,
                                  List<Date> jumpDates, double accuracy, Interpolator i)
-         : this(referenceDate, instruments, dayCounter, jumps, jumpDates, accuracy, i, FastActivator<BootStrap>.Create()) { }
-      public PiecewiseYieldCurve(Date referenceDate, List<RateHelper> instruments,
+          : this(referenceDate, instruments, dayCounter, jumps, jumpDates, accuracy, i, FastActivator<BootStrap>.Create()) { }
+      public PiecewiseDefaultCurve(Date referenceDate, List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments,
                                  DayCounter dayCounter, List<Handle<Quote>> jumps, List<Date> jumpDates,
                                  double accuracy, Interpolator i, BootStrap bootstrap)
-         : base(referenceDate, new Calendar(), dayCounter, jumps, jumpDates)
+          : base(referenceDate, new Calendar(), dayCounter, jumps, jumpDates)
       {
          _traits_ = FastActivator<Traits>.Create();
          base_curve = _traits_.factory<Interpolator>(referenceDate, dayCounter, jumps, jumpDates, i);
@@ -232,15 +245,15 @@ namespace QLNet
          bootstrap_.setup(this);
       }
 
-      public PiecewiseYieldCurve(int settlementDays, Calendar calendar, List<RateHelper> instruments,
+      public PiecewiseDefaultCurve(int settlementDays, Calendar calendar, List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments,
                                  DayCounter dayCounter, List<Handle<Quote>> jumps, List<Date> jumpDates, double accuracy)
-         : this(settlementDays, calendar, instruments, dayCounter, jumps, jumpDates, accuracy,
-                  FastActivator<Interpolator>.Create(), FastActivator<BootStrap>.Create())
+          : this(settlementDays, calendar, instruments, dayCounter, jumps, jumpDates, accuracy,
+                   FastActivator<Interpolator>.Create(), FastActivator<BootStrap>.Create())
       { }
-      public PiecewiseYieldCurve(int settlementDays, Calendar calendar, List<RateHelper> instruments,
+      public PiecewiseDefaultCurve(int settlementDays, Calendar calendar, List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments,
                                  DayCounter dayCounter, List<Handle<Quote>> jumps, List<Date> jumpDates, double accuracy,
                                  Interpolator i, BootStrap bootstrap)
-         : base(settlementDays, calendar, dayCounter, jumps, jumpDates)
+          : base(settlementDays, calendar, dayCounter, jumps, jumpDates)
       {
          _traits_ = FastActivator<Traits>.Create();
          base_curve = _traits_.factory<Interpolator>(settlementDays, calendar, dayCounter, jumps, jumpDates, i);
@@ -256,7 +269,6 @@ namespace QLNet
       // observer interface
       public override void update()
       {
-         base_curve.update();
          base.update();
          // LazyObject::update();        // we do it in the TermStructure 
          if (this.moving_)
@@ -271,28 +283,28 @@ namespace QLNet
    }
 
    // Allows for optional 3rd generic parameter defaulted to IterativeBootstrap
-   public class PiecewiseYieldCurve<Traits, Interpolator> : PiecewiseYieldCurve<Traits, Interpolator, IterativeBootstrapForYield>
-       where Traits : ITraits<YieldTermStructure>, new()
+   public class PiecewiseDefaultCurve<Traits, Interpolator> : PiecewiseDefaultCurve<Traits, Interpolator, IterativeBootstrapForCds>
+       where Traits : ITraits<DefaultProbabilityTermStructure>, new()
        where Interpolator : class, IInterpolationFactory, new()
    {
 
-      public PiecewiseYieldCurve(Date referenceDate, List<RateHelper> instruments, DayCounter dayCounter)
+      public PiecewiseDefaultCurve(Date referenceDate, List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments, DayCounter dayCounter)
           : base(referenceDate, instruments, dayCounter) { }
-      public PiecewiseYieldCurve(Date referenceDate, List<RateHelper> instruments,
+      public PiecewiseDefaultCurve(Date referenceDate, List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments,
                                  DayCounter dayCounter, List<Handle<Quote>> jumps, List<Date> jumpDates)
           : base(referenceDate, instruments, dayCounter, jumps, jumpDates) { }
-      public PiecewiseYieldCurve(Date referenceDate, List<RateHelper> instruments,
+      public PiecewiseDefaultCurve(Date referenceDate, List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments,
                                  DayCounter dayCounter, List<Handle<Quote>> jumps, List<Date> jumpDates, double accuracy)
           : base(referenceDate, instruments, dayCounter, jumps, jumpDates, accuracy) { }
-      public PiecewiseYieldCurve(Date referenceDate, List<RateHelper> instruments,
+      public PiecewiseDefaultCurve(Date referenceDate, List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments,
                                  DayCounter dayCounter, List<Handle<Quote>> jumps, List<Date> jumpDates, double accuracy, Interpolator i)
           : base(referenceDate, instruments, dayCounter, jumps, jumpDates, accuracy, i) { }
 
-      public PiecewiseYieldCurve(int settlementDays, Calendar calendar, List<RateHelper> instruments,
+      public PiecewiseDefaultCurve(int settlementDays, Calendar calendar, List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments,
                                  DayCounter dayCounter)
           : this(settlementDays, calendar, instruments, dayCounter, new List<Handle<Quote>>(), new List<Date>(), 1.0e-12) { }
 
-      public PiecewiseYieldCurve(int settlementDays, Calendar calendar, List<RateHelper> instruments,
+      public PiecewiseDefaultCurve(int settlementDays, Calendar calendar, List<BootstrapHelper<DefaultProbabilityTermStructure>> instruments,
                                     DayCounter dayCounter, List<Handle<Quote>> jumps, List<Date> jumpDates, double accuracy)
           : base(settlementDays, calendar, instruments, dayCounter, jumps, jumpDates, accuracy) { }
    }

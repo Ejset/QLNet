@@ -6,7 +6,7 @@
  QLNet is free software: you can redistribute it and/or modify it
  under the terms of the QLNet license.  You should have received a
  copy of the license along with this program; if not, license is
- available at <https://github.com/amaggiulli/QLNet/blob/develop/LICENSE>.
+ available online at <http://qlnet.sourceforge.net/License.html>.
 
  QLNet is a based on QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -24,9 +24,9 @@ namespace QLNet
       const double basisPoint = 1.0e-4;
 
       public MidPointCdsEngine(Handle<DefaultProbabilityTermStructure> probability,
-                               double recoveryRate,
-                               Handle<YieldTermStructure> discountCurve,
-                               bool? includeSettlementDateFlows = null)
+                                        double recoveryRate,
+                                        Handle<YieldTermStructure> discountCurve,
+                                        bool? includeSettlementDateFlows = null)
       {
          probability_ = probability;
          recoveryRate_ = recoveryRate;
@@ -52,14 +52,14 @@ namespace QLNet
          {
             // date determining the probability survival so we have to pay
             //   the upfront (did not knock out)
-            Date effectiveUpfrontDate =  arguments_.protectionStart > probability_.link.referenceDate() ?
+            Date effectiveUpfrontDate = arguments_.protectionStart > probability_.link.referenceDate() ?
                                          arguments_.protectionStart : probability_.link.referenceDate();
             upfPVO1 = probability_.link.survivalProbability(effectiveUpfrontDate) *
                       discountCurve_.link.discount(arguments_.upfrontPayment.date());
          }
          results_.upfrontNPV = upfPVO1 * arguments_.upfrontPayment.amount();
 
-         results_.couponLegNPV  = 0.0;
+         results_.couponLegNPV = 0.0;
          results_.defaultLegNPV = 0.0;
          for (int i = 0; i < arguments_.leg.Count; ++i)
          {
@@ -79,9 +79,9 @@ namespace QLNet
             if (i == 0)
                startDate = arguments_.protectionStart;
             Date effectiveStartDate =
-               (startDate <= today && today <= endDate) ? today : startDate;
+                (startDate <= today && today <= endDate) ? today : startDate;
             Date defaultDate = // mid-point
-               effectiveStartDate + (endDate - effectiveStartDate) / 2;
+                effectiveStartDate + (endDate - effectiveStartDate) / 2;
 
             double S = probability_.link.survivalProbability(paymentDate);
             double P = probability_.link.defaultProbability(effectiveStartDate, endDate);
@@ -89,51 +89,51 @@ namespace QLNet
             // on one side, we add the fixed rate payments in case of
             // survival...
             results_.couponLegNPV +=
-               S * coupon.amount() *
-               discountCurve_.link.discount(paymentDate);
+                S * coupon.amount() *
+                discountCurve_.link.discount(paymentDate);
             // ...possibly including accrual in case of default.
             if (arguments_.settlesAccrual)
             {
                if (arguments_.paysAtDefaultTime)
                {
                   results_.couponLegNPV +=
-                     P * coupon.accruedAmount(defaultDate) *
-                     discountCurve_.link.discount(defaultDate);
+                      P * coupon.accruedAmount(defaultDate) *
+                      discountCurve_.link.discount(defaultDate);
                }
                else
                {
                   // pays at the end
                   results_.couponLegNPV +=
-                     P * coupon.amount() *
-                     discountCurve_.link.discount(paymentDate);
+                      P * coupon.amount() *
+                      discountCurve_.link.discount(paymentDate);
                }
             }
 
             // on the other side, we add the payment in case of default.
             double claim = arguments_.claim.amount(defaultDate,
-                                                   arguments_.notional.Value,
-                                                   recoveryRate_);
+                                                  arguments_.notional.Value,
+                                                  recoveryRate_);
             if (arguments_.paysAtDefaultTime)
             {
                results_.defaultLegNPV +=
-                  P * claim * discountCurve_.link.discount(defaultDate);
+                   P * claim * discountCurve_.link.discount(defaultDate);
             }
             else
             {
                results_.defaultLegNPV +=
-                  P * claim * discountCurve_.link.discount(paymentDate);
+                   P * claim * discountCurve_.link.discount(paymentDate);
             }
          }
 
          double upfrontSign = 1.0;
          switch (arguments_.side)
          {
-            case Protection.Side.Seller:
+            case CreditDefaultSwap.Protection.Side.Seller:
                results_.defaultLegNPV *= -1.0;
                break;
-            case Protection.Side.Buyer:
+            case CreditDefaultSwap.Protection.Side.Buyer:
                results_.couponLegNPV *= -1.0;
-               results_.upfrontNPV   *= -1.0;
+               results_.upfrontNPV *= -1.0;
                upfrontSign = -1.0;
                break;
             default:
@@ -147,7 +147,7 @@ namespace QLNet
          if (results_.couponLegNPV.IsNotEqual(0.0))
          {
             results_.fairSpread =
-               -results_.defaultLegNPV * arguments_.spread / results_.couponLegNPV;
+                -results_.defaultLegNPV * arguments_.spread / results_.couponLegNPV;
          }
          else
          {
@@ -158,8 +158,8 @@ namespace QLNet
          if (upfrontSensitivity.IsNotEqual(0.0))
          {
             results_.fairUpfront =
-               -upfrontSign * (results_.defaultLegNPV + results_.couponLegNPV)
-               / upfrontSensitivity;
+                -upfrontSign * (results_.defaultLegNPV + results_.couponLegNPV)
+                / upfrontSensitivity;
          }
          else
          {
@@ -170,7 +170,7 @@ namespace QLNet
          if (arguments_.spread.IsNotEqual(0.0))
          {
             results_.couponLegBPS =
-               results_.couponLegNPV * basisPoint / arguments_.spread.Value;
+                results_.couponLegNPV * basisPoint / arguments_.spread.Value;
          }
          else
          {
@@ -180,7 +180,7 @@ namespace QLNet
          if (arguments_.upfront.HasValue && arguments_.upfront.IsNotEqual(0.0))
          {
             results_.upfrontBPS =
-               results_.upfrontNPV * basisPoint / (arguments_.upfront.Value);
+                results_.upfrontNPV * basisPoint / (arguments_.upfront.Value);
          }
          else
          {

@@ -200,7 +200,7 @@ namespace QLNet
          interpolation_.update();
       }
 
-      protected override double discountImpl(double t)
+      protected internal override double discountImpl(double t)
       {
          if (t <= this.times_.Last())
             return interpolation_.value(t, true);

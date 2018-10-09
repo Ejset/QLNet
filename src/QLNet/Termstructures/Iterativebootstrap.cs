@@ -2,13 +2,14 @@
  Copyright (C) 2008 Siarhei Novik (snovik@gmail.com)
  Copyright (C) 2008-2016  Andrea Maggiulli (a.maggiulli@gmail.com)
  Copyright (C) 2014 Edem Dawui (edawui@gmail.com)
+ Copyright (C) 2018 Jean-Camille Tournier (jean-camille.tournier@avivainvestors.com)
 
  This file is part of QLNet Project https://github.com/amaggiulli/qlnet
 
  QLNet is free software: you can redistribute it and/or modify it
  under the terms of the QLNet license.  You should have received a
  copy of the license along with this program; if not, license is
- available at <https://github.com/amaggiulli/QLNet/blob/develop/LICENSE>.
+ available online at <http://qlnet.sourceforge.net/License.html>.
 
  QLNet is a based on QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -41,11 +42,15 @@ namespace QLNet
    {
    }
 
+   public class IterativeBootstrapForCds : IterativeBootstrap<PiecewiseDefaultCurve, DefaultProbabilityTermStructure>
+   {
+   }
+
 
    //! Universal piecewise-term-structure boostrapper.
-   public class IterativeBootstrap<T, U>: IBootStrap<T>
-      where T : Curve<U>, new ()
-      where U : TermStructure
+   public class IterativeBootstrap<T, U> : IBootStrap<T>
+       where T : Curve<U>, new()
+       where U : TermStructure
    {
       private bool validCurve_;
       private T ts_;
@@ -77,9 +82,9 @@ namespace QLNet
             ++firstAliveHelper_;
          alive_ = n_ - firstAliveHelper_;
          Utils.QL_REQUIRE(alive_ >= ts_.interpolator_.requiredPoints - 1, () =>
-                          "not enough alive instruments: " + alive_ +
-                          " provided, " + (ts_.interpolator_.requiredPoints - 1) +
-                          " required");
+                      "not enough alive instruments: " + alive_ +
+                      " provided, " + (ts_.interpolator_.requiredPoints - 1) +
+                      " required");
 
 
          if (ts_.dates_ == null)
@@ -98,7 +103,7 @@ namespace QLNet
 
 
          errors_ = new List<BootstrapError<T, U>>(alive_ + 1);
-         dates[0] = firstDate ;
+         dates[0] = firstDate;
          times[0] = (ts_.timeFromReference(dates[0]));
          Date latestRelevantDate, maxDate = firstDate;
          for (int i = 1, j = firstAliveHelper_; j < n_; ++i, ++j)
@@ -112,11 +117,11 @@ namespace QLNet
             // check that the helper is really extending the curve, i.e. that
             // pillar-sorted helpers are also sorted by latestRelevantDate
             Utils.QL_REQUIRE(latestRelevantDate > maxDate, () =>
-                             (j + 1) + " instrument (pillar: " +
-                             dates[i] + ") has latestRelevantDate (" +
-                             latestRelevantDate + ") before or equal to " +
-                             "previous instrument's latestRelevantDate (" +
-                             maxDate + ")");
+                        (j + 1) + " instrument (pillar: " +
+                        dates[i] + ") has latestRelevantDate (" +
+                        latestRelevantDate + ") before or equal to " +
+                        "previous instrument's latestRelevantDate (" +
+                        maxDate + ")");
             maxDate = latestRelevantDate;
 
             // when a pillar date is different from the last relevant date the
@@ -149,7 +154,7 @@ namespace QLNet
          Utils.QL_REQUIRE(n_ > 0, () => "no bootstrap helpers given");
 
          Utils.QL_REQUIRE(n_ + 1 >= ts_.interpolator_.requiredPoints, () =>
-                          "not enough instruments: " + n_ + " provided, " + (ts_.interpolator_.requiredPoints - 1) + " required");
+            "not enough instruments: " + n_ + " provided, " + (ts_.interpolator_.requiredPoints - 1) + " required");
 
          ts_.instruments_.ForEach((i, x) => ts_.registerWith(x));
 
@@ -172,8 +177,8 @@ namespace QLNet
             BootstrapHelper<U> helper = ts_.instruments_[j];
             // check for valid quote
             Utils.QL_REQUIRE(helper.quote().link.isValid(), () =>
-                             (j + 1) + " instrument (maturity: " +
-                             helper.pillarDate() + ") has an invalid quote");
+                               (j + 1) + " instrument (maturity: " +
+                       helper.pillarDate() + ") has an invalid quote");
             // don't try this at home!
             // This call creates helpers, and removes "const".
             // There is a significant interaction with observability.
@@ -246,10 +251,10 @@ namespace QLNet
                      continue;
                   }
                   Utils.QL_FAIL((iteration + 1) + " iteration: failed " +
-                                "at " + (i) + " alive instrument, " +
-                                "maturity " + ts_.instruments_[i - 1].pillarDate() +
-                                ", reference date " + ts_.dates_[0] +
-                                ": " + e.Message);
+                           "at " + (i) + " alive instrument, " +
+                           "maturity " + ts_.instruments_[i - 1].pillarDate() +
+                           ", reference date " + ts_.dates_[0] +
+                           ": " + e.Message);
                }
 
             }
@@ -261,7 +266,7 @@ namespace QLNet
             double change = Math.Abs(data[1] - previousData_[1]);
             for (int i = 2; i <= alive_; ++i)
                change = Math.Max(change, Math.Abs(data[i] - previousData_[i]));
-            if (change <= accuracy)    // convergence reached
+            if (change <= accuracy)  // convergence reached
                break;
 
             Utils.QL_REQUIRE(iteration < maxIterations, () =>

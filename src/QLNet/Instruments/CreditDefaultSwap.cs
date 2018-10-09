@@ -5,13 +5,13 @@
 
  QLNet is free software: you can redistribute it and/or modify it
  under the terms of the QLNet license.  You should have received a
- copy of the license along with this program; if not, license is
- available at <https://github.com/amaggiulli/QLNet/blob/develop/LICENSE>.
-
+ copy of the license along with this program; if not, license is  
+ available online at <http://qlnet.sourceforge.net/License.html>.
+  
  QLNet is a based on QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
  The QuantLib license is available online at http://quantlib.org/license.shtml.
-
+ 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
@@ -22,17 +22,6 @@ using System.Linq;
 
 namespace QLNet
 {
-   public struct Protection
-   {
-      public enum Side { Buyer, Seller }
-   }
-
-   public enum PricingModel
-   {
-      Midpoint,
-      ISDA
-   }
-
    /// <summary>
    /// Credit default swap
    /// <remarks>
@@ -51,6 +40,17 @@ namespace QLNet
    /// </summary>
    public class CreditDefaultSwap : Instrument
    {
+      public struct Protection
+      {
+         public enum Side { Buyer, Seller }
+      }
+
+      public enum PricingModel
+      {
+         Midpoint,
+         ISDA
+      }
+
       /// <summary>
       /// CDS quoted as running-spread only
       /// </summary>
@@ -66,20 +66,20 @@ namespace QLNet
       /// <param name="protectionStart">The first date where a default event will trigger the contract.</param>
       /// <param name="claim"></param>
       /// <param name="lastPeriodDayCounter">Day-count convention for accrual in last period</param>
-      /// <param name="rebatesAccrual">The protection seller pays the accrued scheduled current coupon at the start
+      /// <param name="rebatesAccrual">The protection seller pays the accrued scheduled current coupon at the start 
       /// of the contract. The rebate date is not provided but computed to be two days after protection start.</param>
       public CreditDefaultSwap(Protection.Side side,
-                               double notional,
-                               double spread,
-                               Schedule schedule,
-                               BusinessDayConvention convention,
-                               DayCounter dayCounter,
-                               bool settlesAccrual = true,
-                               bool paysAtDefaultTime = true,
-                               Date protectionStart = null,
-                               Claim claim = null,
-                               DayCounter lastPeriodDayCounter = null,
-                               bool rebatesAccrual = true)
+                                  double notional,
+                                  double spread,
+                                  Schedule schedule,
+                                  BusinessDayConvention convention,
+                                  DayCounter dayCounter,
+                                  bool settlesAccrual = true,
+                                  bool paysAtDefaultTime = true,
+                                  Date protectionStart = null,
+                                  Claim claim = null,
+                           DayCounter lastPeriodDayCounter = null,
+                           bool rebatesAccrual = true)
       {
 
          side_ = side;
@@ -92,15 +92,15 @@ namespace QLNet
          protectionStart_ = protectionStart ?? schedule[0];
 
          Utils.QL_REQUIRE(protectionStart_ <= schedule[0] ||
-                          schedule.rule() == DateGeneration.Rule.CDS ||
-                          schedule.rule() == DateGeneration.Rule.CDS2015
-                          , () => "protection can not start after accrual");
+                           schedule.rule() == DateGeneration.Rule.CDS ||
+                           schedule.rule() == DateGeneration.Rule.CDS2015
+            , () => "protection can not start after accrual");
 
          leg_ = new FixedRateLeg(schedule)
-         .withLastPeriodDayCounter(lastPeriodDayCounter)
-         .withCouponRates(spread, dayCounter)
-         .withNotionals(notional)
-         .withPaymentAdjustment(convention);
+            .withLastPeriodDayCounter(lastPeriodDayCounter)
+            .withCouponRates(spread, dayCounter)
+            .withNotionals(notional)
+            .withPaymentAdjustment(convention);
 
          Date effectiveUpfrontDate = schedule.calendar().advance(protectionStart_, 2, TimeUnit.Days, convention);
          // '2' is used above since the protection start is assumed to be on trade_date + 1
@@ -138,22 +138,22 @@ namespace QLNet
       /// <param name="upfrontDate">Settlement date for the upfront payment.</param>
       /// <param name="claim"></param>
       /// <param name="lastPeriodDayCounter">Day-count convention for accrual in last period</param>
-      /// <param name="rebatesAccrual">The protection seller pays the accrued scheduled current coupon at the start
+      /// <param name="rebatesAccrual">The protection seller pays the accrued scheduled current coupon at the start 
       /// of the contract. The rebate date is not provided but computed to be two days after protection start.</param>
       public CreditDefaultSwap(Protection.Side side,
-                               double notional,
-                               double upfront,
-                               double runningSpread,
-                               Schedule schedule,
-                               BusinessDayConvention convention,
-                               DayCounter dayCounter,
-                               bool settlesAccrual = true,
-                               bool paysAtDefaultTime = true,
-                               Date protectionStart = null,
-                               Date upfrontDate = null,
-                               Claim claim = null,
-                               DayCounter lastPeriodDayCounter = null,
-                               bool rebatesAccrual = true)
+                                       double notional,
+                                       double upfront,
+                                       double runningSpread,
+                                       Schedule schedule,
+                                       BusinessDayConvention convention,
+                                       DayCounter dayCounter,
+                                       bool settlesAccrual = true,
+                                       bool paysAtDefaultTime = true,
+                                       Date protectionStart = null,
+                                       Date upfrontDate = null,
+                                       Claim claim = null,
+                              DayCounter lastPeriodDayCounter = null,
+                             bool rebatesAccrual = true)
       {
 
          side_ = side;
@@ -166,10 +166,10 @@ namespace QLNet
          protectionStart_ = protectionStart ?? schedule[0];
 
          Utils.QL_REQUIRE(protectionStart_ <= schedule[0] ||
-                          schedule.rule() == DateGeneration.Rule.CDS
-                          , () => "protection can not start after accrual");
+                           schedule.rule() == DateGeneration.Rule.CDS
+            , () => "protection can not start after accrual");
          leg_ = new FixedRateLeg(schedule)
-         .withLastPeriodDayCounter(lastPeriodDayCounter)
+            .withLastPeriodDayCounter(lastPeriodDayCounter)
          .withCouponRates(runningSpread, dayCounter)
          .withNotionals(notional)
          .withPaymentAdjustment(convention);
@@ -177,7 +177,7 @@ namespace QLNet
          // If empty, adjust to T+3 standard settlement, alternatively add
          //  an arbitrary date to the constructor
          Date effectiveUpfrontDate = upfrontDate == null ?
-                                     schedule.calendar().advance(protectionStart_, 2, TimeUnit.Days, convention) : upfrontDate;
+            schedule.calendar().advance(protectionStart_, 2, TimeUnit.Days, convention) : upfrontDate;
          // '2' is used above since the protection start is assumed to be
          //   on trade_date + 1
          upfrontPayment_ = new SimpleCashFlow(notional * upfront, effectiveUpfrontDate);
@@ -264,8 +264,8 @@ namespace QLNet
       /// The last date for which defaults will trigger the contract
       /// </summary>
       /// <returns></returns>
-      public Date protectionEndDate() {return ((Coupon)(leg_.Last())).accrualEndDate();}
-      public bool rebatesAccrual() {return accrualRebate_ != null;}
+      public Date protectionEndDate() { return ((Coupon)(leg_.Last())).accrualEndDate(); }
+      public bool rebatesAccrual() { return accrualRebate_ != null; }
       // Results
       /// <summary>
       /// Returns the upfront spread that, given the running spread
@@ -366,16 +366,16 @@ namespace QLNet
       /// <param name="accuracy"></param>
       /// <returns></returns>
       public double impliedHazardRate(double targetNPV,
-                                      Handle<YieldTermStructure> discountCurve,
-                                      DayCounter dayCounter,
-                                      double recoveryRate = 0.4,
-                                      double accuracy = 1.0e-6,
-                                      PricingModel model = PricingModel.Midpoint)
+                                                Handle<YieldTermStructure> discountCurve,
+                                                DayCounter dayCounter,
+                                                double recoveryRate = 0.4,
+                                                double accuracy = 1.0e-6,
+                                    PricingModel model = PricingModel.Midpoint)
       {
          SimpleQuote flatRate = new SimpleQuote(0.0);
 
          Handle<DefaultProbabilityTermStructure> probability = new Handle<DefaultProbabilityTermStructure>(
-            new FlatHazardRate(0, new WeekendsOnly(), new Handle<Quote>(flatRate), dayCounter));
+         new FlatHazardRate(0, new WeekendsOnly(), new Handle<Quote>(flatRate), dayCounter));
 
          IPricingEngine engine = null;
          switch (model)
@@ -439,14 +439,14 @@ namespace QLNet
       /// <param name="dayCounter"></param>
       /// <returns></returns>
       public double? conventionalSpread(double conventionalRecovery,
-                                        Handle<YieldTermStructure> discountCurve,
-                                        DayCounter dayCounter,
-                                        PricingModel model = PricingModel.Midpoint)
+                                                  Handle<YieldTermStructure> discountCurve,
+                                                  DayCounter dayCounter,
+                                     PricingModel model = PricingModel.Midpoint)
       {
          SimpleQuote flatRate = new SimpleQuote(0.0);
 
          Handle<DefaultProbabilityTermStructure> probability = new Handle<DefaultProbabilityTermStructure>(
-            new FlatHazardRate(0, new WeekendsOnly(), new Handle<Quote>(flatRate), dayCounter));
+               new FlatHazardRate(0, new WeekendsOnly(), new Handle<Quote>(flatRate), dayCounter));
 
          IPricingEngine engine = null;
          switch (model)
@@ -588,7 +588,7 @@ namespace QLNet
       }
 
       public abstract class Engine : GenericEngine<CreditDefaultSwap.Arguments, CreditDefaultSwap.Results>
-      {}
+      { }
 
    }
 }

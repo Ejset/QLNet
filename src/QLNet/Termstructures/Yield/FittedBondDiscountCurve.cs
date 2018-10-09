@@ -171,7 +171,7 @@ namespace QLNet
 
       }
 
-      protected override double discountImpl(double t)
+      protected internal override double discountImpl(double t)
       {
          calculate();
          return fittingMethod_.discountFunction(fittingMethod_.solution_, t);

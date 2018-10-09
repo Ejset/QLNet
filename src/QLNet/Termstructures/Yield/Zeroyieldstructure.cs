@@ -67,7 +67,7 @@ namespace QLNet
       /*! Returns the discount factor for the given date calculating it
           from the zero yield.
       */
-      protected override double discountImpl(double t)
+      protected internal override double discountImpl(double t)
       {
          if (t.IsEqual(0.0))     // this acts as a safe guard in cases where
             return 1.0;   // zeroYieldImpl(0.0) would throw.

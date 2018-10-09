@@ -150,10 +150,46 @@ namespace QLNet
       #endregion
    }
 
+   //! Bootstrap helper with date schedule relative to global evaluation date
+   /*! Derived classes must takes care of rebuilding the date schedule when
+       the global evaluation date changes
+   */
+   public class RelativeDateBootstrapHelper<TS> : BootstrapHelper<TS>
+   {
+      public RelativeDateBootstrapHelper(Handle<Quote> quote)
+          : base(quote)
+      {
+         Settings.registerWith(update);
+         evaluationDate_ = Settings.evaluationDate();
+      }
+
+      public RelativeDateBootstrapHelper(double quote)
+          : base(quote)
+      {
+         Settings.registerWith(update);
+         evaluationDate_ = Settings.evaluationDate();
+      }
+
+      //! \name Observer interface
+      //@{
+      public override void update()
+      {
+         if (evaluationDate_ != Settings.evaluationDate())
+         {
+            evaluationDate_ = Settings.evaluationDate();
+            initializeDates();
+         }
+         base.update();
+      }
+      //@}
+      protected virtual void initializeDates() { }
+      protected Date evaluationDate_;
+   };
+
    public class RateHelper : BootstrapHelper<YieldTermStructure>
    {
       public RateHelper() : base() { } // required for generics
-      public RateHelper(Handle<Quote> quote) : base(quote) {}
-      public RateHelper(double quote) : base(quote) {}
+      public RateHelper(Handle<Quote> quote) : base(quote) { }
+      public RateHelper(double quote) : base(quote) { }
    }
 }

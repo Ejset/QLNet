@@ -1,17 +1,18 @@
 ﻿/*
  Copyright (C) 2008-2016  Andrea Maggiulli (a.maggiulli@gmail.com)
+ Copyright (C) 2018 Jean-Camille Tournier (jean-camille.tournier@avivainvestors.com)
 
  This file is part of QLNet Project https://github.com/amaggiulli/qlnet
 
  QLNet is free software: you can redistribute it and/or modify it
  under the terms of the QLNet license.  You should have received a
- copy of the license along with this program; if not, license is
- available at <https://github.com/amaggiulli/QLNet/blob/develop/LICENSE>.
-
+ copy of the license along with this program; if not, license is  
+ available online at <http://qlnet.sourceforge.net/License.html>.
+  
  QLNet is a based on QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
  The QuantLib license is available online at http://quantlib.org/license.shtml.
-
+ 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
@@ -38,15 +39,15 @@ namespace QLNet
    {
       #region Constructors
 
-      protected HazardRateStructure(DayCounter dc = null, List<Handle<Quote> > jumps = null, List<Date> jumpDates = null)
-         : base(dc, jumps, jumpDates) {}
+      protected HazardRateStructure(DayCounter dc = null, List<Handle<Quote>> jumps = null, List<Date> jumpDates = null)
+         : base(dc, jumps, jumpDates) { }
 
       protected HazardRateStructure(Date referenceDate, Calendar cal = null, DayCounter dc = null,
-                                    List<Handle<Quote> > jumps = null, List<Date> jumpDates = null)
+         List<Handle<Quote>> jumps = null, List<Date> jumpDates = null)
          : base(referenceDate, cal, dc, jumps, jumpDates) { }
 
       protected HazardRateStructure(int settlementDays, Calendar cal, DayCounter dc = null,
-                                    List<Handle<Quote> > jumps = null, List<Date> jumpDates = null)
+         List<Handle<Quote>> jumps = null, List<Date> jumpDates = null)
          : base(settlementDays, cal, dc, jumps, jumpDates) { }
 
       #endregion
@@ -57,9 +58,6 @@ namespace QLNet
       // perform the actual calculations. When it is called,
       // range check has already been performed; therefore, it
       // must assume that extrapolation is required.
-
-      //! hazard rate calculation
-      protected abstract double hazardRateImpl(double t);
 
       #endregion
 
@@ -76,7 +74,7 @@ namespace QLNet
                   Derived classes should override it if a more efficient
                   implementation is available.
       */
-      protected override double survivalProbabilityImpl(double t)
+      protected internal override double survivalProbabilityImpl(double t)
       {
          GaussChebyshevIntegration integral = new GaussChebyshevIntegration(48);
          // this stores the address of the method to integrate (so that
@@ -89,7 +87,7 @@ namespace QLNet
       }
 
       //! default density calculation
-      protected override double defaultDensityImpl(double t)
+      protected internal override double defaultDensityImpl(double t)
       {
          return hazardRateImpl(t) * survivalProbabilityImpl(t);
       }

@@ -136,10 +136,10 @@ namespace QLNet
          double upfrontSign = 1.0;
          switch (arguments_.side)
          {
-            case Protection.Side.Seller:
+            case CreditDefaultSwap.Protection.Side.Seller:
                results_.defaultLegNPV *= -1.0;
                break;
-            case Protection.Side.Buyer:
+            case CreditDefaultSwap.Protection.Side.Buyer:
                results_.couponLegNPV *= -1.0;
                results_.upfrontNPV   *= -1.0;
                upfrontSign = -1.0;

@@ -1,18 +1,19 @@
 ﻿/*
  Copyright (C) 2008-2014  Andrea Maggiulli (a.maggiulli@gmail.com)
  Copyright (C) 2014  Edem Dawui (edawui@gmail.com)
+ Copyright (C) 2018 Jean-Camille Tournier (jean-camille.tournier@avivainvestors.com)
 
  This file is part of QLNet Project https://github.com/amaggiulli/qlnet
 
  QLNet is free software: you can redistribute it and/or modify it
  under the terms of the QLNet license.  You should have received a
- copy of the license along with this program; if not, license is
- available at <https://github.com/amaggiulli/QLNet/blob/develop/LICENSE>.
-
+ copy of the license along with this program; if not, license is  
+ available online at <http://qlnet.sourceforge.net/License.html>.
+  
  QLNet is a based on QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
  The QuantLib license is available online at http://quantlib.org/license.shtml.
-
+ 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
@@ -37,7 +38,7 @@ namespace QLNet
          else
          {
             return Utils.inflationPeriod(t.referenceDate() - t.observationLag(),
-                                         t.frequency()).Key;
+                                          t.frequency()).Key;
          }
       }
 
@@ -46,19 +47,19 @@ namespace QLNet
          return t.baseRate();
       }
 
-      public double guess(int i, InterpolatedCurve c, bool validData, int f)
+      public double guess<C>(int i, C c, bool validData, int f) where C : Curve<ZeroInflationTermStructure>
       {
-         if (validData)   // previous iteration value
+         if (validData) // previous iteration value
             return c.data()[i];
 
-         if (i == 1)   // first pillar
+         if (i == 1) // first pillar
             return avgInflation;
 
          // could/should extrapolate
          return avgInflation;
       }
 
-      public double minValueAfter(int i, InterpolatedCurve c, bool validData, int f)
+      public double minValueAfter<C>(int i, C c, bool validData, int f) where C : Curve<ZeroInflationTermStructure>
       {
          if (validData)
          {
@@ -68,7 +69,7 @@ namespace QLNet
          return -maxInflation;
       }
 
-      public double maxValueAfter(int i, InterpolatedCurve c, bool validData, int f)
+      public double maxValueAfter<C>(int i, C c, bool validData, int f) where C : Curve<ZeroInflationTermStructure>
       {
          if (validData)
          {
@@ -89,12 +90,20 @@ namespace QLNet
       {
          return 5;
       }
+   }
 
-      public double discountImpl(Interpolation i, double t) { throw new NotSupportedException(); }
-
-      public double zeroYieldImpl(Interpolation i, double t) { throw new NotSupportedException(); }
-
-      public double forwardImpl(Interpolation i, double t) { throw new NotSupportedException(); }
+   public static class ITraitsZeroInflationTermStructure
+   {
+      public static ZeroInflationTermStructure factory<Interpolator>(this ITraits<ZeroInflationTermStructure> self,
+                                                      Date referenceDate, Calendar calendar, DayCounter dayCounter, Period lag,
+                                                      Frequency frequency, bool indexIsInterpolated, double baseZeroRate,
+                                                      Handle<YieldTermStructure> yTS,
+                                                      Interpolator interpolator = default(Interpolator))
+           where Interpolator : class, IInterpolationFactory, new()
+      {
+         return new InterpolatedZeroInflationCurve<Interpolator>(referenceDate, calendar, dayCounter, lag, frequency,
+                                                                 indexIsInterpolated, baseZeroRate, yTS, interpolator);
+      }
    }
 
    public class YoYInflationTraits : ITraits<YoYInflationTermStructure>
@@ -111,7 +120,7 @@ namespace QLNet
          else
          {
             return Utils.inflationPeriod(t.referenceDate() - t.observationLag(),
-                                         t.frequency()).Key;
+                                          t.frequency()).Key;
          }
       }
 
@@ -120,19 +129,19 @@ namespace QLNet
          return t.baseRate();
       }
 
-      public double guess(int i, InterpolatedCurve c, bool validData, int f)
+      public double guess<C>(int i, C c, bool validData, int f) where C : Curve<YoYInflationTermStructure>
       {
-         if (validData)   // previous iteration value
+         if (validData) // previous iteration value
             return c.data()[i];
 
-         if (i == 1)   // first pillar
+         if (i == 1) // first pillar
             return avgInflation;
 
          // could/should extrapolate
          return avgInflation;
       }
 
-      public double minValueAfter(int i, InterpolatedCurve c, bool validData, int f)
+      public double minValueAfter<C>(int i, C c, bool validData, int f) where C : Curve<YoYInflationTermStructure>
       {
          if (validData)
          {
@@ -142,7 +151,7 @@ namespace QLNet
          return -maxInflation;
       }
 
-      public double maxValueAfter(int i, InterpolatedCurve c, bool validData, int f)
+      public double maxValueAfter<C>(int i, C c, bool validData, int f) where C : Curve<YoYInflationTermStructure>
       {
          if (validData)
          {
@@ -163,10 +172,20 @@ namespace QLNet
       {
          return 40;
       }
+   }
 
-      public double discountImpl(Interpolation i, double t) { throw new NotSupportedException(); }
-      public double zeroYieldImpl(Interpolation i, double t) { throw new NotSupportedException(); }
-      public double forwardImpl(Interpolation i, double t) { throw new NotSupportedException(); }
+   public static class ITraitsYoYInflationTermStructure
+   {
+      public static YoYInflationTermStructure factory<Interpolator>(this ITraits<YoYInflationTermStructure> self,
+                                                      Date referenceDate, Calendar calendar, DayCounter dayCounter, Period lag,
+                                                      Frequency frequency, bool indexIsInterpolated, double baseZeroRate,
+                                                      Handle<YieldTermStructure> yTS,
+                                                      Interpolator interpolator = default(Interpolator))
+           where Interpolator : class, IInterpolationFactory, new()
+      {
+         return new InterpolatedYoYInflationCurve<Interpolator>(referenceDate, calendar, dayCounter, lag, frequency,
+                                                                 indexIsInterpolated, baseZeroRate, yTS, interpolator);
+      }
    }
 
 }

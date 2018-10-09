@@ -23,7 +23,7 @@ namespace QLNet
    {
       public MakeCreditDefaultSwap(Period tenor, double couponRate)
       {
-         side_ = Protection.Side.Buyer;
+         side_ = CreditDefaultSwap.Protection.Side.Buyer;
          nominal_ = 1.0;
          tenor_ = tenor;
          couponTenor_ = new Period(3, TimeUnit.Months);
@@ -34,7 +34,7 @@ namespace QLNet
       }
       public MakeCreditDefaultSwap(Date termDate, double couponRate)
       {
-         side_ = Protection.Side.Buyer;
+         side_ = CreditDefaultSwap.Protection.Side.Buyer;
          nominal_ = 1.0;
          termDate_ = termDate;
          couponTenor_ = new Period(3, TimeUnit.Months);
@@ -75,7 +75,7 @@ namespace QLNet
          upfrontRate_ = upfrontRate;
          return this;
       }
-      public MakeCreditDefaultSwap withSide(Protection.Side side)
+      public MakeCreditDefaultSwap withSide(CreditDefaultSwap.Protection.Side side)
       {
          side_ = side;
          return this;
@@ -107,7 +107,7 @@ namespace QLNet
          return this;
       }
 
-      private Protection.Side side_;
+      private CreditDefaultSwap.Protection.Side side_;
       double nominal_;
       Period tenor_;
       Date termDate_;
