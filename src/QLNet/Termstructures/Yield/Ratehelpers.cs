@@ -589,7 +589,7 @@ namespace QLNet
          pillarDate_ = customPillarDate;
          initializeDates();
       }
-
+      
       public override void setTermStructure(YieldTermStructure t)
       {
          // no need to register---the index is not lazy
@@ -655,6 +655,116 @@ namespace QLNet
       // need to init this because it is used before the handle has any link, i.e. setTermStructure will be used after ctor
       RelinkableHandle<YieldTermStructure> termStructureHandle_ = new RelinkableHandle<YieldTermStructure>();
 
+   }
+
+   //Class ImmFraRateHelper added from ORE -Mikael 09Oct2018
+
+   /*
+ Copyright (C) 2017 Quaternion Risk Management Ltd
+ All rights reserved.
+
+ This file is part of ORE, a free-software/open-source library
+ for transparent pricing and risk analysis - http://opensourcerisk.org
+
+ ORE is free software: you can redistribute it and/or modify it
+ under the terms of the Modified BSD License.  You should have received a
+ copy of the license along with this program.
+ The license is also available online at <http://opensourcerisk.org>
+
+ This program is distributed on the basis that it will form a useful
+ contribution to risk analytics and model standardisation, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE. See the license for more details.
+*/
+   public class ImmFraRateHelper : RelativeDateRateHelper
+   {
+      protected Date fixingDate_;
+      protected int imm1_;
+      protected int imm2_;
+      protected Pillar.Choice pillarChoice_;
+      protected IborIndex iborIndex_;
+      protected RelinkableHandle<YieldTermStructure> termStructureHandle_;
+
+      public ImmFraRateHelper(Handle<Quote> rate,
+                              int imm1,
+                              int imm2,
+                              IborIndex i,
+                              Pillar.Choice pillarChoice = Pillar.Choice.LastRelevantDate,
+                              Date customPillarDate = default(Date) //Date()
+                              )
+          : base(rate)
+      {
+         imm1_ = imm1;
+         imm2_ = imm2;
+         pillarChoice_ = pillarChoice;
+
+         iborIndex_ = i.clone(termStructureHandle_);
+         iborIndex_.unregisterWith(termStructureHandle_.link.update); ////iborIndex_->unregisterWith(termStructureHandle_);??
+         pillarDate_ = customPillarDate;
+         initializeDates();
+      }
+
+      public override double impliedQuote()
+      {
+         QLNet.Utils.QL_REQUIRE(termStructure_ != null, () => "term structure not set");
+         return iborIndex_.fixing(fixingDate_, true);
+      }
+
+      public override void setTermStructure(YieldTermStructure t)
+      {
+         // do not set the relinkable handle as an observer -
+         // force recalculation when needed---the index is not lazy
+         bool observer = false;
+
+         termStructureHandle_.linkTo(t, observer);
+         base.setTermStructure(t);
+      }
+
+      protected override void initializeDates()
+      {
+         // if the evaluation date is not a business day
+         // then move to the next business day
+         Date referenceDate = iborIndex_.fixingCalendar().adjust(evaluationDate_);
+         Date spotDate = iborIndex_.fixingCalendar().advance(referenceDate, iborIndex_.fixingDays(), TimeUnit.Days);
+
+         earliestDate_ = iborIndex_.fixingCalendar().adjust(getImmDate(spotDate, imm1_));
+         maturityDate_ = iborIndex_.fixingCalendar().adjust(getImmDate(spotDate, imm2_));
+
+         // latest relevant date is calculated from earliestDate_ instead
+         latestRelevantDate_ = iborIndex_.maturityDate(earliestDate_);
+
+         switch (pillarChoice_)
+         {
+            case Pillar.Choice.MaturityDate:
+               pillarDate_ = maturityDate_;
+               break;
+            case Pillar.Choice.LastRelevantDate:
+               pillarDate_ = latestRelevantDate_;
+               break;
+            case Pillar.Choice.CustomDate:
+               // pillarDate_ already assigned at construction time
+               QLNet.Utils.QL_REQUIRE(pillarDate_ >= earliestDate_, () => "pillar date (" + pillarDate_.ToString() + ") must be later than or equal to the instrument's earliest date (" + earliestDate_.ToString() + ")");
+               QLNet.Utils.QL_REQUIRE(pillarDate_ <= latestRelevantDate_, () => "pillar date (" + pillarDate_.ToString() + ") must be before or equal to the instrument's latest relevant date (" + latestRelevantDate_.ToString() + ")");
+               break;
+            default:
+               QLNet.Utils.QL_FAIL("unknown Pillar::Choice(" + (int)pillarChoice_ + ")");
+               break;
+         }
+
+         latestDate_ = pillarDate_; // backward compatibility
+
+         fixingDate_ = iborIndex_.fixingDate(earliestDate_);
+      }
+
+      protected Date getImmDate(Date asof, int i)
+      {
+         Date imm = asof;
+         for (int j = 0; j < i; j++)
+         {
+            imm = IMM.nextDate(imm, true);
+         }
+         return imm;
+      }
    }
 
    // Rate helper for bootstrapping over swap rates
