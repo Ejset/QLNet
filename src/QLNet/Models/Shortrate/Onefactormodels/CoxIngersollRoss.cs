@@ -41,10 +41,11 @@ namespace QLNet
                               double sigma = 0.1)
          : base(4)
       {
-         theta_ = arguments_[0];
-         k_ = arguments_[1];
-         sigma_ = arguments_[2];
-         r0_ = arguments_[3];
+
+         theta_ = arguments_[0] = new ConstantParameter(theta, new NoConstraint());
+         k_ = arguments_[1] = new ConstantParameter(k, new PositiveConstraint());
+         sigma_ = arguments_[2] = new ConstantParameter(sigma, new PositiveConstraint());
+         r0_ = arguments_[3] = new ConstantParameter(r0, new NoConstraint());         
       }
 
       public override double discountBondOption(Option.Type type,
