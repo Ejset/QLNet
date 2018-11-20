@@ -28,8 +28,7 @@ namespace QLNet
        <li>Sundays</li>
        <li>New Year's Day, January 1st (possibly moved to Monday)</li>
        <li>Family Day, third Monday of February (since 2008)</li>
-       <li>Good Friday</li>
-       <li>Easter Monday</li>
+       <li>Good Friday</li>       
        <li>Victoria Day, The Monday on or preceding 24 May</li>
        <li>Canada Day, July 1st (possibly moved to Monday)</li>
        <li>Provincial Holiday, first Monday of August</li>
@@ -47,8 +46,7 @@ namespace QLNet
        <li>Sundays</li>
        <li>New Year's Day, January 1st (possibly moved to Monday)</li>
        <li>Family Day, third Monday of February (since 2008)</li>
-       <li>Good Friday</li>
-       <li>Easter Monday</li>
+       <li>Good Friday</li>       
        <li>Victoria Day, The Monday on or preceding 24 May</li>
        <li>Canada Day, July 1st (possibly moved to Monday)</li>
        <li>Provincial Holiday, first Monday of August</li>
@@ -109,9 +107,7 @@ namespace QLNet
                 || ((d >= 15 && d <= 21) && w == DayOfWeek.Monday && m == Month.February
                     && y >= 2008)
                 // Good Friday
-                || (dd == em - 3)
-                // Easter Monday
-                || (dd == em)
+                || (dd == em - 3)                
                 // The Monday on or preceding 24 May (Victoria Day)
                 || (d > 17 && d <= 24 && w == DayOfWeek.Monday && m == Month.May)
                 // July 1st, possibly moved to Monday (Canada Day)
@@ -158,9 +154,7 @@ namespace QLNet
                 || ((d >= 15 && d <= 21) && w == DayOfWeek.Monday && m == Month.February
                     && y >= 2008)
                 // Good Friday
-                || (dd == em - 3)
-                // Easter Monday
-                || (dd == em)
+                || (dd == em - 3)                
                 // The Monday on or preceding 24 May (Victoria Day)
                 || (d > 17 && d <= 24 && w == DayOfWeek.Monday && m == Month.May)
                 // July 1st, possibly moved to Monday (Canada Day)
