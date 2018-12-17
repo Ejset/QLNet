@@ -36,6 +36,7 @@ namespace QLNet
        <li>New Year's Day, January 1st</li>
        <li>May Day, May 1st</li>
        <li>National Independence Day, May 17st</li>
+       <li>Christmas Eve, December 24th</li>
        <li>Christmas, December 25th</li>
        <li>Boxing Day, December 26th</li>
        </ul>
@@ -77,6 +78,8 @@ namespace QLNet
                 || (d == 1 && m == Month.May)
                 // National Independence Day
                 || (d == 17 && m == Month.May)
+                // Christmas Eve
+                || (d == 24 && m == Month.December)
                 // Christmas
                 || (d == 25 && m == Month.December)
                 // Boxing Day

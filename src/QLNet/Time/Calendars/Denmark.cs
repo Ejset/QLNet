@@ -36,6 +36,7 @@ namespace QLNet
        <li>Whit (Pentecost) Monday </li>
        <li>New Year's Day, January 1st</li>
        <li>Constitution Day, June 5th</li>
+       <li>Christmas Eve, December 24th</li>
        <li>Christmas, December 25th</li>
        <li>Boxing Day, December 26th</li>
        </ul>
@@ -76,6 +77,8 @@ namespace QLNet
                 || (d == 1 && m == Month.January)
                 // Constitution Day, June 5th
                 || (d == 5 && m == Month.June)
+                // Christmas Eve
+                || (d == 24 && m == Month.December)
                 // Christmas
                 || (d == 25 && m == Month.December)
                 // Boxing Day

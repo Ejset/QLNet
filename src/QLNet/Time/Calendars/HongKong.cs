@@ -293,6 +293,41 @@ namespace QLNet
                   || (d == 21 && m == Month.October))
                   return false;
             }
+
+            if (y == 2018)
+            {
+               if (// Lunar New Year
+                  ((d == 16 && m == Month.February) || (d == 19 && m == Month.February))
+                  // Ching Ming Festival
+                  || (d == 5 && m == Month.April)                  
+                  // Buddha's birthday
+                  || (d == 22 && m == Month.May)
+                  // Tuen Ng festival
+                  || (d == 18 && m == Month.June)
+                  // Mid-autumn festival
+                  || (d == 25 && m == Month.September)
+                  // Chung Yeung festival
+                  || (d == 17 && m == Month.October))
+                  return false;
+            }
+
+            if (y == 2019)
+            {
+               if (// Lunar New Year
+                  ((d == 5 && m == Month.February) || (d == 6 && m == Month.February) || (d == 7 && m == Month.February))
+                  // Ching Ming Festival
+                  || (d == 5 && m == Month.April)
+                  // Buddha's birthday
+                  || (d == 13 && m == Month.May)
+                  // Tuen Ng festival
+                  || (d == 7 && m == Month.June)
+                  // Mid-autumn festival
+                  || (d == 14 && m == Month.September)
+                  // Chung Yeung festival
+                  || (d == 7 && m == Month.October))
+                  return false;
+            }
+
             return true;
          }
       }

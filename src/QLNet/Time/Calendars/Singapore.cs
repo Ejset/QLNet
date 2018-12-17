@@ -91,6 +91,8 @@ namespace QLNet
                 || ((d == 11 || d == 12) && m == Month.February && y == 2013)
                 || (d == 31 && m == Month.January && y == 2014)
                 || (d == 1 && m == Month.February && y == 2014)
+                || ((d == 16 || d == 17) && m == Month.February && y == 2018)
+                || ((d == 5 || d == 6) && m == Month.February && y == 2019)
 
                 // Hari Raya Haji
                 || ((d == 1 || d == 2) && m == Month.February && y == 2004)
@@ -104,6 +106,8 @@ namespace QLNet
                 || (d == 26 && m == Month.October && y == 2012)
                 || (d == 15 && m == Month.October && y == 2013)
                 || (d == 6 && m == Month.October && y == 2014)
+                || (d == 22 && m == Month.August && y == 2018)
+                || (d == 12 && m == Month.August && y == 2019)
 
                 // Vesak Poya Day
                 || (d == 2 && m == Month.June && y == 2004)
@@ -116,6 +120,8 @@ namespace QLNet
                 || (d == 5 && m == Month.May && y == 2012)
                 || (d == 24 && m == Month.May && y == 2013)
                 || (d == 13 && m == Month.May && y == 2014)
+                || (d == 29 && m == Month.May && y == 2018)
+                || (d == 20 && m == Month.May && y == 2019)
 
                 // Deepavali
                 || (d == 11 && m == Month.November && y == 2004)
@@ -126,6 +132,8 @@ namespace QLNet
                 || (d == 13 && m == Month.November && y == 2012)
                 || (d == 2 && m == Month.November && y == 2013)
                 || (d == 23 && m == Month.October && y == 2014)
+                || (d == 6 && m == Month.November && y == 2018)
+                || (d == 28 && m == Month.October && y == 2019)
 
                 // Diwali
                 || (d == 1 && m == Month.November && y == 2005)
@@ -141,6 +149,8 @@ namespace QLNet
                 || (d == 20 && m == Month.August && y == 2012)
                 || (d == 8 && m == Month.August && y == 2013)
                 || (d == 28 && m == Month.July && y == 2014)
+                || (d == 15 && m == Month.June && y == 2018)
+                || (d == 5 && m == Month.June && y == 2019)
                )
                return false;
             return true;

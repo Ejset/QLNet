@@ -142,8 +142,8 @@ namespace QLNet
                 // Labor Thanksgiving Day
                 || ((d == 23 || (d == 24 && w == DayOfWeek.Monday)) && m == Month.November)
                 // Emperor's Birthday
-                || ((d == 23 || (d == 24 && w == DayOfWeek.Monday)) && m == Month.December
-                    && y >= 1989)
+                || ((d == 23 || (d == 24 && w == DayOfWeek.Monday)) && m == Month.December && (y >= 1989 && y <= 2018))
+                || ((d == 23 || (d == 24 && w == DayOfWeek.Monday)) && m == Month.February && y >= 2020)
                 // Bank Holiday
                 || (d == 31 && m == Month.December)
                 // one-shot holidays

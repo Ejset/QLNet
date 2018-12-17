@@ -33,7 +33,7 @@ namespace QLNet
        <li>Good Friday</li>
        <li>Easter Monday</li>
        <li>Ascension</li>
-       <li>Whit(Pentecost) Monday </li>
+       <li>Whit(Pentecost) Monday (until 2004)</li>
        <li>May Day, May 1st</li>
        <li>National Day, June 6th</li>
        <li>Midsummer Eve (Friday between June 19-25)</li>
@@ -69,8 +69,8 @@ namespace QLNet
                 || (dd == em)
                 // Ascension Thursday
                 || (dd == em + 38)
-                // Whit Monday
-                || (dd == em + 49)
+                // Whit Monday (till 2004)
+                || (dd == em + 49 && y < 2005)
                 // New Year's Day
                 || (d == 1  && m == Month.January)
                 // Epiphany
@@ -80,8 +80,8 @@ namespace QLNet
                 // June 6 id National Day but is not a holiday.
                 // It has been debated wheter or not this day should be
                 // declared as a holiday.
-                // As of 2002 the Stockholmborsen is open that day
-                // || (d == 6  && m == June)
+                // As of 2018 the Stockholmborsen is not open that day
+                || (d == 6  && m == Month.June)
                 // Midsummer Eve (Friday between June 19-25)
                 || (w == DayOfWeek.Friday && (d >= 19 && d <= 25) && m == Month.June)
                 // Christmas Eve
