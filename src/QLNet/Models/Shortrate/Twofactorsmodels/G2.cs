@@ -234,11 +234,11 @@ namespace QLNet
          return valuex + valuey + value;
       }
 
-      double a() { return a_.value(0.0); }
-      double sigma() { return sigma_.value(0.0); }
-      double b() { return b_.value(0.0); }
-      double eta() { return eta_.value(0.0); }
-      double rho() { return rho_.value(0.0); }
+      public double a() { return a_.value(0.0); }
+      public double sigma() { return sigma_.value(0.0); }
+      public double b() { return b_.value(0.0); }
+      public double eta() { return eta_.value(0.0); }
+      public double rho() { return rho_.value(0.0); }
 
       #endregion
 
