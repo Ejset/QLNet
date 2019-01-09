@@ -26,6 +26,14 @@ namespace QLNet
    public class InterpolatedHazardRateCurve<Interpolator> : HazardRateStructure, InterpolatedCurve
        where Interpolator : class, IInterpolationFactory, new()
    {
+
+      // TODO: Verify this constructor!
+      public InterpolatedHazardRateCurve(List<Date> dates, List<double> hazardRates, DayCounter dayCounter, Calendar cal = null)              
+          : this(dates, hazardRates, dayCounter, cal, default(Interpolator))
+      {
+         
+      }
+
       public InterpolatedHazardRateCurve(List<Date> dates, List<double> hazardRates, DayCounter dayCounter, Calendar cal = null,
               List<Handle<Quote>> jumps = null, List<Date> jumpDates = null, Interpolator interpolator = default(Interpolator))
           : base(dates[0], cal, dayCounter, jumps, jumpDates)
