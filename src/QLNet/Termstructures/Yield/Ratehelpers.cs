@@ -683,7 +683,7 @@ namespace QLNet
       protected int imm2_;
       protected Pillar.Choice pillarChoice_;
       protected IborIndex iborIndex_;
-      protected RelinkableHandle<YieldTermStructure> termStructureHandle_;
+      protected RelinkableHandle<YieldTermStructure> termStructureHandle_ = new RelinkableHandle<YieldTermStructure>();
 
       public ImmFraRateHelper(Handle<Quote> rate,
                               int imm1,
@@ -699,7 +699,7 @@ namespace QLNet
          pillarChoice_ = pillarChoice;
 
          iborIndex_ = i.clone(termStructureHandle_);
-         iborIndex_.unregisterWith(termStructureHandle_.link.update); ////iborIndex_->unregisterWith(termStructureHandle_);??
+         iborIndex_.registerWith(update);  //iborIndex_.unregisterWith(termStructureHandle_.link.update); ////iborIndex_->unregisterWith(termStructureHandle_);??
          pillarDate_ = customPillarDate;
          initializeDates();
       }
