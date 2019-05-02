@@ -699,6 +699,7 @@ namespace QLNet
          pillarChoice_ = pillarChoice;
 
          iborIndex_ = i.clone(termStructureHandle_);
+
          //iborIndex_.unregisterWith(termStructureHandle_.link.update); ////iborIndex_->unregisterWith(termStructureHandle_);??        
          iborIndex_.registerWith(update);         
 
