@@ -126,7 +126,7 @@ namespace QLNet
             updated_ = false;
 
          // recheck. this is in order to notify observers in the base method of LazyObject
-         calculated_ = true;
+         //calculated_ = true; //Removed due to stack overflow in MultiCurveBootstrapping example
          base.update();
          // otherwise the following code would be required
          // the grand reason is that multiple inheritance is not allowed in c# and we need to notify observers in such way

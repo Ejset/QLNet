@@ -53,11 +53,27 @@ namespace QLNet
       // It must be implemented in derived classes and linked to the event of the required Observer
       public virtual void update()
       {
-         // observers don't expect notifications from frozen objects
-         // LazyObject forwards notifications only once until it has been recalculated
-         if (!frozen_ && calculated_)
-            notifyObservers();
-         calculated_ = false;
+         // QuantLib
+         if (calculated_)
+         {
+            // set to false early
+            // 1) to prevent infinite recursion
+            // 2) otherways non-lazy observers would be served obsolete
+            //    data because of calculated_ being still true
+            calculated_ = false;
+            // observers don't expect notifications from frozen objects
+            if (!frozen_)
+               notifyObservers();
+            // exiting notifyObservers() calculated_ could be
+            // already true because of non-lazy observers
+         }
+
+         // QLNet
+         //// observers don't expect notifications from frozen objects
+         //// LazyObject forwards notifications only once until it has been recalculated
+         //if (!frozen_ && calculated_)
+         //   notifyObservers();
+         //calculated_ = false;
       }
       #endregion
 

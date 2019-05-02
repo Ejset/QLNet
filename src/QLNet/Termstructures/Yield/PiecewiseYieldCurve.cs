@@ -256,7 +256,7 @@ namespace QLNet
       // observer interface
       public override void update()
       {
-         base_curve.update();
+         //base_curve.update();
          base.update();
          // LazyObject::update();        // we do it in the TermStructure 
          if (this.moving_)
